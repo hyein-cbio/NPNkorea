@@ -1,0 +1,24 @@
+Package: NPNkorea
+Type: Package
+Title: Convert the longitude / latitude to Korea's National Point Number (국가지점번호) and vice versa.
+Version: 0.1.0
+Authors@R: c(
+    person(
+      "Hyein", "Cho",
+      email = "hc27oclock@gmail.com",
+      role = c("aut", "cre")
+    )
+  )
+Description: More about what it does (maybe more than one line).
+    Continuation lines should be indented.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Imports:
+    sf
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+RoxygenNote: 7.3.2
+Depends: 
+    R (>= 3.5)
