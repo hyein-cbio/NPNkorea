@@ -2,16 +2,17 @@
 % Please edit documentation in R/toWGS.R
 \name{toWGS}
 \alias{toWGS}
-\title{Convert NPN to the GPS coordinate in WGS84}
+\title{Convert Korea's National Point Number to WGS84 coordinates}
 \usage{
 toWGS(input.string)
 }
 \arguments{
-\item{input.string}{Input character vector containing NPN properly spaced}
+\item{input.string}{A character vector of NPN strings. Compact forms without
+spaces are supported for both Hangul and romanized inputs.}
 }
 \value{
-longitude and latitude
+A numeric matrix with `lon` and `lat` columns.
 }
 \description{
-Convert NPN to the GPS coordinate in WGS84
+Convert Korea's National Point Number to WGS84 coordinates
 }

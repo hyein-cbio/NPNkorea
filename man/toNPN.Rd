@@ -2,16 +2,18 @@
 % Please edit documentation in R/toNPN.R
 \name{toNPN}
 \alias{toNPN}
-\title{Convert the GPS coordinate in WGS84 to NPN}
+\title{Convert WGS84 coordinates to Korea's National Point Number}
 \usage{
 toNPN(input.df, output = "han")
 }
 \arguments{
-\item{input.df}{Input data frame containing longitude and latitude as columns}
+\item{input.df}{A data frame with numeric `lon` and `lat` columns.}
+
+\item{output}{Either `"han"` (Hangul, default) or `"abc"` (romanized syllables).}
 }
 \value{
-NPN format (4 significant digits)
+A character vector of NPN values in `XX 1234 5678` form.
 }
 \description{
-Convert the GPS coordinate in WGS84 to NPN
+Convert WGS84 coordinates to Korea's National Point Number
 }

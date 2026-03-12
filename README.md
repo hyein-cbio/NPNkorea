@@ -7,14 +7,22 @@ WGS84 기반 위경도 좌표와 국가지점번호 표기 상호간 변환이 �
 toNPN(data.frame(lon=126.978422, lat=37.566742))
 [1] "다사 5393 5205"
 
+# Romanized output
+toNPN(data.frame(lon=126.978422, lat=37.566742), output="abc")
+[1] "DaSa 5393 5205"
+
 ```
 
 GPS 경도, 위도로
 ```R
 # 서울시청
 toWGS("다사 5396 5207")
-                   [,1]     [,2]
+                 lon      lat
 다사 5396 5207 126.9787 37.56684
 
-```
+# Compact input without spaces also works
+toWGS("DaSa53965207")
+               lon      lat
+DaSa53965207 126.9787 37.56684
 
+```
