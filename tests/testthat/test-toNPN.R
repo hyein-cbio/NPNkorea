@@ -1,29 +1,36 @@
 test_that("toNPN converts single and multiple coordinates", {
   pts = data.frame(
-    lon = c(126.978422, 129.075642, 126.705206),
-    lat = c(37.566742, 35.179554, 37.456255)
+    lon = c(126.978422, 129.075642, 126.705206, 126.4982702),
+    lat = c(37.566742, 35.179554, 37.456255, 33.4889944)
   )
 
   expect_equal(
     toNPN(pts),
-    c("다사 5393 5205", "마라 4347 8827", "다사 2970 3996")
+    c("다사 5393 5205", "마라 4347 8827", "다사 2970 3996", "다다 0694 0013")
   )
 
   expect_equal(
     toNPN(pts, output = "abc"),
-    c("DaSa 5393 5205", "MaRa 4347 8827", "DaSa 2970 3996")
+    c("DaSa 5393 5205", "MaRa 4347 8827", "DaSa 2970 3996", "DaDa 0694 0013")
   )
 })
 
 test_that("toNPN round-trips coordinates generated from NPN cells", {
-  npn_han = c("다사 5396 5207", "마라 4347 8827")
+  npn_han = c("다사 5396 5207", "마라 4347 8827", "다다 0694 0013")
   coords = as.data.frame(toWGS(npn_han))
 
   expect_equal(toNPN(coords), npn_han)
   expect_equal(
     toNPN(coords, output = "abc"),
-    c("DaSa 5396 5207", "MaRa 4347 8827")
+    c("DaSa 5396 5207", "MaRa 4347 8827", "DaDa 0694 0013")
   )
+})
+
+test_that("toNPN returns an empty character vector for empty input", {
+  empty_pts = data.frame(lon = numeric(), lat = numeric())
+
+  expect_equal(toNPN(empty_pts), character(0))
+  expect_equal(toNPN(empty_pts, output = "abc"), character(0))
 })
 
 test_that("toNPN validates input", {
@@ -37,8 +44,18 @@ test_that("toNPN validates input", {
     "`lon` and `lat` columns must be numeric."
   )
   expect_error(toNPN(data.frame(lon = 140, lat = 37.5)), "`lon` must be between 124 and 133.")
+  expect_error(toNPN(data.frame(lon = 126.9, lat = 32)), "`lat` must be between 32 and 39.")
+  expect_error(toNPN(data.frame(lon = 126.9, lat = 39)), "`lat` must be between 32 and 39.")
   expect_error(
     toNPN(data.frame(lon = 126.9, lat = NA_real_)),
+    "`lon` and `lat` must be finite."
+  )
+  expect_error(
+    toNPN(data.frame(lon = Inf, lat = 37.5)),
+    "`lon` and `lat` must be finite."
+  )
+  expect_error(
+    toNPN(data.frame(lon = 126.9, lat = -Inf)),
     "`lon` and `lat` must be finite."
   )
   expect_error(toNPN(data.frame(lon = 126.9, lat = 37.5), output = "latin"), "should be one of")

@@ -1,7 +1,40 @@
-#' Convert WGS84 coordinates to Korea's National Point Number
-#' @param input.df A data frame with numeric `lon` and `lat` columns.
-#' @param output Either `"han"` (Hangul, default) or `"abc"` (romanized syllables).
-#' @return A character vector of NPN values in `XX 1234 5678` form.
+#' Convert WGS84 coordinates to National Point Numbers
+#'
+#' \code{toNPN()} converts WGS84 longitude/latitude coordinates into Korea's
+#' National Point Number (NPN) notation.
+#'
+#' @param input.df A data frame with numeric \code{lon} and \code{lat} columns
+#'   in WGS84 decimal degrees. Additional columns are allowed, but only
+#'   \code{lon} and \code{lat}
+#'   are used.
+#' @param output Output alphabet for the leading two-letter grid band:
+#'   \code{"han"} (default) returns Hangul labels such as \code{"다사"}, and
+#'   \code{"abc"} returns romanized labels such as \code{"DaSa"}.
+#'
+#' @details
+#' Coordinates are transformed from WGS84 (EPSG:4326) to EPSG:5179, then mapped
+#' to the NPN 10 m grid. Longitude must fall between 124 and 133 degrees, and
+#' latitude must fall between 32 and 39 degrees; non-finite values are rejected.
+#'
+#' The returned NPN strings are formatted as \code{XX 1234 5678}, where
+#' \code{XX} is the
+#' 100 km grid-band pair and each four-digit block is a 10 m offset within that
+#' band.
+#'
+#' @return A character vector of NPN strings, one per row of \code{input.df}.
+#'   The output always uses the spaced form \code{XX 1234 5678}.
+#'
+#' @seealso \code{\link{toWGS}()} for the reverse conversion.
+#' @family NPN conversion
+#'
+#' @examples
+#' pts = data.frame(
+#'   lon = c(126.978422, 129.075642),
+#'   lat = c(37.566742, 35.179554)
+#' )
+#'
+#' toNPN(pts)
+#' toNPN(pts, output = "abc")
 #' @importFrom sf st_as_sf st_transform st_coordinates
 #' @export
 

@@ -1,7 +1,35 @@
-#' Convert Korea's National Point Number to WGS84 coordinates
-#' @param input.string A character vector of NPN strings. Compact forms without
-#' spaces are supported for both Hangul and romanized inputs.
-#' @return A numeric matrix with `lon` and `lat` columns.
+#' Convert National Point Numbers to WGS84 coordinates
+#'
+#' \code{toWGS()} parses Korea's National Point Number (NPN) strings and returns the
+#' corresponding longitude/latitude coordinates in WGS84.
+#'
+#' @param input.string A character vector of NPN strings. Both Hangul labels
+#'   (for example, \code{"다사 5396 5207"}) and romanized labels (for example,
+#'   \code{"DaSa53965207"}) are supported. Whitespace is optional, and romanized
+#'   input is matched case-insensitively.
+#'
+#' @details
+#' Each NPN value is interpreted as a 100 km grid-band pair plus two four-digit
+#' offsets that identify a 10 m grid cell. The returned coordinates correspond
+#' to the southwest corner of that grid cell after transforming from EPSG:5179
+#' to WGS84 (EPSG:4326).
+#'
+#' Empty input returns a \code{0 x 2} numeric matrix. Missing values and malformed
+#' NPN strings raise an error.
+#'
+#' @return A numeric matrix with one row per input string. The matrix has row
+#'   names equal to \code{input.string} and two columns named \code{lon} and
+#'   \code{lat}.
+#'
+#' @seealso \code{\link{toNPN}()} for the reverse conversion.
+#' @family NPN conversion
+#'
+#' @examples
+#' toWGS("다사 5396 5207")
+#'
+#' toWGS(c("다사53965207", "MaRa43478827"))
+#'
+#' toWGS(c("DaSa 5396 5207", "dada06940013"))
 #' @importFrom sf st_as_sf st_transform st_coordinates
 #' @export
 
