@@ -15,6 +15,8 @@
 #' Coordinates are transformed from WGS84 (EPSG:4326) to EPSG:5179, then mapped
 #' to the NPN 10 m grid. Longitude must fall between 124 and 133 degrees, and
 #' latitude must fall between 32 and 39 degrees; non-finite values are rejected.
+#' Coordinates that fall outside the supported NPN grid after projection also
+#' raise an error.
 #'
 #' The returned NPN strings are formatted as \code{XX 1234 5678}, where
 #' \code{XX} is the
@@ -46,26 +48,20 @@ toNPN = function(input.df, output="han") {
     return(character(0))
   }
 
-  sf_points = st_as_sf(
-    input.df,
-    coords=c("lon", "lat"),
-    crs=4326
-  )
-
-  sf_utm = st_transform(sf_points, crs=5179)
-  coords = st_coordinates(sf_utm)
-
-  coords[, "X"] = coords[, "X"] - 1e6 + 3e5
-  coords[, "Y"] = coords[, "Y"] - 2e6 + 7e5
-  coords = round(coords, digits = 6)
+  coords = project_to_npn_grid(input.df)
+  parsed = validate_npn_grid_coords(coords)
 
   lookup_col = if (output == "han") "han" else "abc"
-  Xletter = digits.df[[lookup_col]][match(floor(coords[, "X"] / 1e5) + 1, digits.df$digits)]
-  Yletter = digits.df[[lookup_col]][match(floor(coords[, "Y"] / 1e5) + 1, digits.df$digits)]
+  Xletter = digits.df[[lookup_col]][match(parsed$x_digit, digits.df$digits)]
+  Yletter = digits.df[[lookup_col]][match(parsed$y_digit, digits.df$digits)]
 
-  Xpos = floor((coords[, "X"] %% 1e5) / 10)
-  Ypos = floor((coords[, "Y"] %% 1e5) / 10)
-
-  return(paste0(Xletter, Yletter, " ", sprintf("%04d", Xpos), " ", sprintf("%04d", Ypos)))
+  return(paste0(
+    Xletter,
+    Yletter,
+    " ",
+    sprintf("%04d", parsed$x_pos),
+    " ",
+    sprintf("%04d", parsed$y_pos)
+  ))
 
 }

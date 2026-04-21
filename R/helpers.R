@@ -28,6 +28,49 @@ validate_lonlat_df = function(input.df) {
   coords
 }
 
+project_to_npn_grid = function(input.df) {
+  sf_points = st_as_sf(
+    input.df,
+    coords = c("lon", "lat"),
+    crs = 4326
+  )
+
+  sf_utm = st_transform(sf_points, crs = 5179)
+  coords = st_coordinates(sf_utm)
+
+  coords[, "X"] = coords[, "X"] - 1e6 + 3e5
+  coords[, "Y"] = coords[, "Y"] - 2e6 + 7e5
+
+  round(coords, digits = 6)
+}
+
+validate_npn_grid_coords = function(coords) {
+  if (any(!is.finite(coords[, "X"])) || any(!is.finite(coords[, "Y"]))) {
+    stop("`input.df` contains coordinates that could not be projected to the NPN grid.")
+  }
+
+  x_digit = floor(coords[, "X"] / 1e5) + 1
+  y_digit = floor(coords[, "Y"] / 1e5) + 1
+
+  if (any(!x_digit %in% digits.df$digits) || any(!y_digit %in% digits.df$digits)) {
+    stop("`input.df` contains coordinates outside the supported NPN grid after projection.")
+  }
+
+  x_pos = floor((coords[, "X"] %% 1e5) / 10)
+  y_pos = floor((coords[, "Y"] %% 1e5) / 10)
+
+  if (any(x_pos < 0 | x_pos > 9999) || any(y_pos < 0 | y_pos > 9999)) {
+    stop("`input.df` contains coordinates outside the supported NPN grid after projection.")
+  }
+
+  list(
+    x_digit = x_digit,
+    y_digit = y_digit,
+    x_pos = x_pos,
+    y_pos = y_pos
+  )
+}
+
 parse_npn_string = function(input.s) {
   input.compact = gsub("\\s+", "", trimws(input.s))
 

@@ -28,6 +28,8 @@ National Point Number (NPN) notation.
 Coordinates are transformed from WGS84 (EPSG:4326) to EPSG:5179, then mapped
 to the NPN 10 m grid. Longitude must fall between 124 and 133 degrees, and
 latitude must fall between 32 and 39 degrees; non-finite values are rejected.
+Coordinates that fall outside the supported NPN grid after projection also
+raise an error.
 
 The returned NPN strings are formatted as \code{XX 1234 5678}, where
 \code{XX} is the

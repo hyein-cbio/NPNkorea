@@ -60,3 +60,45 @@ test_that("toNPN validates input", {
   )
   expect_error(toNPN(data.frame(lon = 126.9, lat = 37.5), output = "latin"), "should be one of")
 })
+
+test_that("toNPN rejects coordinates outside the supported NPN grid after projection", {
+  expect_error(
+    toNPN(data.frame(lon = 124.000001, lat = 33)),
+    "outside the supported NPN grid after projection"
+  )
+  expect_error(
+    toNPN(data.frame(lon = 124.2, lat = 32.1)),
+    "outside the supported NPN grid after projection"
+  )
+})
+
+test_that("toNPN never emits NA grid bands", {
+  pts = data.frame(
+    lon = c(124.4, 124.9, 125.5, 132.8),
+    lat = c(33.0, 38.5, 35.0, 32.5)
+  )
+
+  out = toNPN(pts)
+
+  expect_false(any(grepl("NA", out, fixed = TRUE)))
+})
+
+test_that("toNPN round-trips random NPN cells", {
+  digits = get("digits.df", envir = asNamespace("NPNkorea"))
+
+  set.seed(1)
+  npn_han = paste0(
+    sample(digits$han, 50, replace = TRUE),
+    sample(digits$han, 50, replace = TRUE),
+    " ",
+    sprintf("%04d", sample(0:9999, 50, replace = TRUE)),
+    " ",
+    sprintf("%04d", sample(0:9999, 50, replace = TRUE))
+  )
+
+  coords = as.data.frame(toWGS(npn_han))
+  keep = coords$lon > 124 & coords$lon < 133 & coords$lat > 32 & coords$lat < 39
+
+  expect_gt(sum(keep), 0)
+  expect_equal(toNPN(coords[keep, , drop = FALSE]), npn_han[keep])
+})
