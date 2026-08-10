@@ -9,8 +9,6 @@ Authors@R: c(
       role = c("aut", "cre")
     )
   )
-Author: Hyein Cho [aut, cre]
-Maintainer: Hyein Cho <hyein.sophia.cho@gmail.com>
 Description: Converts between Korea's National Point Number (NPN) grid
     references and WGS84 longitude/latitude coordinates, with support for
     both Hangul and romanized NPN labels.

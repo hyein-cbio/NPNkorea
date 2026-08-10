@@ -61,6 +61,28 @@ test_that("toNPN validates input", {
   expect_error(toNPN(data.frame(lon = 126.9, lat = 37.5), output = "latin"), "should be one of")
 })
 
+test_that("CLI to-npn prints tabular output", {
+  output = capture.output(
+    result <- NPNkorea:::npnkorea_cli(
+      c("to-npn", "--lon", "126.978422", "--lat", "37.566742", "--output", "abc")
+    )
+  )
+
+  expect_equal(result, data.frame(npn = "DaSa 5393 5205", check.names = FALSE))
+  expect_equal(output, c("npn", "DaSa 5393 5205"))
+})
+
+test_that("CLI to-npn validates repeated lon/lat arguments", {
+  expect_error(
+    NPNkorea:::npnkorea_cli(c("to-npn", "--lon", "126.978422")),
+    "`to-npn` requires both `--lon` and `--lat`."
+  )
+  expect_error(
+    NPNkorea:::npnkorea_cli(c("to-npn", "--lon", "126.978422", "--lat", "37.566742", "--lat", "35.179554")),
+    "`--lon` and `--lat` must be provided the same number of times."
+  )
+})
+
 test_that("toNPN rejects coordinates outside the supported NPN grid after projection", {
   expect_error(
     toNPN(data.frame(lon = 124.000001, lat = 33)),

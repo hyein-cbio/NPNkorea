@@ -42,3 +42,23 @@ test_that("toWGS validates input strings", {
   expect_error(toWGS("다사 539 5207"), "must be valid NPN strings")
   expect_error(toWGS("갸사 5396 5207"), "must use valid NPN letter pairs")
 })
+
+test_that("CLI to-wgs prints tabular output", {
+  output = capture.output(
+    result <- NPNkorea:::npnkorea_cli(
+      c("to-wgs", "--code", "다사 5396 5207", "--code", "MaRa43478827")
+    )
+  )
+
+  expect_equal(names(result), c("lon", "lat"))
+  expect_equal(result$lon, c(126.97866380715097, 129.0756266828708), tolerance = 1e-10)
+  expect_equal(result$lat, c(37.56684471509263, 35.17949162224057), tolerance = 1e-10)
+  expect_equal(output[1], "lon\tlat")
+})
+
+test_that("CLI help and command validation work", {
+  help_output = capture.output(NPNkorea:::npnkorea_cli("--help"))
+  expect_true(any(grepl("Usage:", help_output, fixed = TRUE)))
+  expect_error(NPNkorea:::npnkorea_cli("unknown"), "Unknown command: unknown")
+  expect_error(NPNkorea:::npnkorea_cli(c("to-wgs")), "`to-wgs` requires at least one `--code`.")
+})

@@ -1,0 +1,4 @@
+#!/usr/bin/env Rscript
+
+suppressPackageStartupMessages(library(NPNkorea))
+NPNkorea:::npnkorea_cli(commandArgs(TRUE))

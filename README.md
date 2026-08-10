@@ -1,6 +1,21 @@
 Can convert in both directions of Korea's National Point Number and longitude and latitude coordinates in WGS84 (GPS).
 WGS84 기반 위경도 좌표와 국가지점번호 표기 상호간 변환이 가능합니다.
 
+## Installation
+
+GitHub에서 `remotes`를 사용해 설치할 수 있습니다.
+
+```r
+install.packages("remotes")
+remotes::install_github("hyein-cbio/NPNkorea")
+```
+
+설치 후 패키지를 불러옵니다.
+
+```r
+library(NPNkorea)
+```
+
 국가지점번호로
 ```R
 # 서울시청
@@ -25,6 +40,40 @@ toWGS("DaSa53965207")
                lon      lat
 DaSa53965207 126.9787 37.56684
 
+```
+
+## Command line usage
+
+After installation, the package also includes a small command line wrapper at
+`system.file("exec", "npnkorea", package = "NPNkorea")`.
+
+Convert WGS84 coordinates to NPN:
+
+```bash
+Rscript "$(Rscript -e 'cat(system.file("exec", "npnkorea", package = "NPNkorea"))')" \
+  to-npn --lon 126.978422 --lat 37.566742
+```
+
+Expected tab-separated output:
+
+```text
+npn
+다사 5393 5205
+```
+
+Convert NPN strings to WGS84:
+
+```bash
+Rscript "$(Rscript -e 'cat(system.file("exec", "npnkorea", package = "NPNkorea"))')" \
+  to-wgs --code "다사 5396 5207" --code "MaRa43478827"
+```
+
+Expected tab-separated output:
+
+```text
+lon	lat
+126.97866380715097	37.56684471509263
+129.0756266828708	35.17949162224057
 ```
 
 ## Internal lookup table
