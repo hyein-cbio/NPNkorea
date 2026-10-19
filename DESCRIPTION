@@ -1,7 +1,7 @@
 Package: NPNkorea
 Type: Package
 Title: Convert the longitude / latitude to Korea's National Point Number (국가지점번호) and vice versa
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: c(
     person(
       "Hyein", "Cho",
@@ -19,6 +19,6 @@ Imports:
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
-RoxygenNote: 7.3.3
 Depends: 
     R (>= 3.5)
+Config/roxygen2/version: 8.1.0

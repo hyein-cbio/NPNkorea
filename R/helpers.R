@@ -1,3 +1,153 @@
+canonicalize_tonpn_arg_name = function(name) {
+  if (!nzchar(name) || name %in% c("lat", "output")) {
+    return(name)
+  }
+
+  # `output` used to be a formal argument, so prefixes such as `out` and `o`
+  # still match it. `lat` stays exact: it was not part of the old signature.
+  if (!is.na(pmatch(name, "output"))) {
+    return("output")
+  }
+
+  name
+}
+
+resolve_tonpn_args = function(input.df, ...) {
+  args = list(...)
+  arg_names = names(args)
+  if (is.null(arg_names)) {
+    arg_names = rep("", length(args))
+  }
+
+  arg_names = vapply(arg_names, canonicalize_tonpn_arg_name, character(1), USE.NAMES = FALSE)
+  names(args) = arg_names
+
+  if (sum(arg_names == "output") > 1) {
+    stop("`output` was specified twice.")
+  }
+
+  if (sum(arg_names == "lat") > 1) {
+    stop("`lat` was specified twice.")
+  }
+
+  unknown = arg_names[arg_names != "" & !arg_names %in% c("lat", "output")]
+  if (length(unknown) > 0) {
+    stop(
+      "Unused argument(s) in `toNPN()`: ",
+      paste(unknown, collapse = ", "),
+      "."
+    )
+  }
+
+  positional = args[arg_names == ""]
+  has_output = "output" %in% arg_names
+  has_lat = "lat" %in% arg_names
+  output = if (has_output) args$output else "han"
+  lat = if (has_lat) args$lat else NULL
+
+  if (is.numeric(input.df) && is.null(dim(input.df))) {
+    if (length(positional) > 0) {
+      if (!is.null(lat)) {
+        stop("`lat` was specified twice.")
+      }
+      if (!is.numeric(positional[[1]]) || !is.null(dim(positional[[1]]))) {
+        stop("`lat` is required when the first argument is numeric.")
+      }
+      lat = positional[[1]]
+      positional = positional[-1]
+    }
+
+    if (is.null(lat)) {
+      stop("`lat` is required when the first argument is numeric.")
+    }
+
+    if (!is.numeric(lat) || !is.null(dim(lat))) {
+      stop("`lat` must be numeric.")
+    }
+
+    if (length(positional) > 0) {
+      stop("For numeric input, pass `output` by name.")
+    }
+  } else {
+    if (!is.null(lat)) {
+      stop("`lat` is only valid when the first argument is numeric.")
+    }
+
+    if (length(positional) > 1) {
+      stop("Unexpected arguments to `toNPN()`.")
+    }
+
+    if (length(positional) == 1) {
+      if (has_output) {
+        stop("`output` was specified twice.")
+      }
+      output = positional[[1]]
+    }
+  }
+
+  list(output = output, lat = lat)
+}
+
+coerce_tonpn_input = function(input.df, lat = NULL) {
+  if (is.numeric(input.df) && is.null(dim(input.df))) {
+    if (length(input.df) != length(lat)) {
+      stop("`lon` and `lat` must have the same length.")
+    }
+
+    return(validate_lonlat_df(data.frame(lon = input.df, lat = lat)))
+  }
+
+  if (inherits(input.df, "sf") || inherits(input.df, "sfc")) {
+    return(lonlat_df_from_points(input.df))
+  }
+
+  validate_lonlat_df(input.df)
+}
+
+lonlat_df_from_points = function(x) {
+  geom = if (inherits(x, "sfc")) x else st_geometry(x)
+
+  if (is.na(st_crs(geom))) {
+    stop("`input.df` sf/sfc objects must have a CRS.")
+  }
+
+  if (length(geom) == 0) {
+    return(data.frame(lon = numeric(), lat = numeric()))
+  }
+
+  geometry_types = as.character(st_geometry_type(geom, by_geometry = TRUE))
+  if (any(geometry_types != "POINT")) {
+    stop("`input.df` sf/sfc objects must contain only POINT geometries.")
+  }
+
+  if (any(st_is_empty(geom))) {
+    stop("`input.df` sf/sfc objects must not contain empty geometries.")
+  }
+
+  geom = st_transform(geom, 4326)
+  coords = st_coordinates(geom)
+
+  if (any(!is.finite(coords[, "X"])) || any(!is.finite(coords[, "Y"]))) {
+    stop("`lon` and `lat` must be finite.")
+  }
+
+  validate_lonlat_df(data.frame(lon = coords[, "X"], lat = coords[, "Y"]))
+}
+
+format_npn_parts = function(x_digit, y_digit, x_pos, y_pos, output, spaced = TRUE) {
+  lookup_col = if (output == "han") "han" else "abc"
+  x_letter = digits.df[[lookup_col]][match(x_digit, digits.df$digits)]
+  y_letter = digits.df[[lookup_col]][match(y_digit, digits.df$digits)]
+  x_text = sprintf("%04d", x_pos)
+  y_text = sprintf("%04d", y_pos)
+
+  if (spaced) {
+    paste0(x_letter, y_letter, " ", x_text, " ", y_text)
+  } else {
+    paste0(x_letter, y_letter, x_text, y_text)
+  }
+}
+
 validate_lonlat_df = function(input.df) {
   if (!inherits(input.df, "data.frame")) {
     stop("`input.df` must be a data frame.")

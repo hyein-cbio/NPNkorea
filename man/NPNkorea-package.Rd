@@ -10,9 +10,15 @@ Converts between Korea's National Point Number (NPN) grid references and WGS84 l
 }
 \section{Main functions}{
 
-\code{\link{toNPN}()} converts WGS84 coordinates into NPN strings.
+\code{\link{toNPN}()} converts WGS84 coordinates into NPN strings. It accepts
+a data frame, POINT \code{sf}/\code{sfc} objects, or numeric longitude and
+latitude vectors.
 
 \code{\link{toWGS}()} parses NPN strings and returns WGS84 coordinates.
+
+\code{\link{is_npn}()} tests whether strings are valid NPN values.
+\code{\link{format_npn}()} reprints valid strings in Hangul or romanized
+form.
 }
 
 \section{Supported labels}{
@@ -33,6 +39,11 @@ EPSG:4326.
 
 \author{
 \strong{Maintainer}: Hyein Cho \email{hyein.sophia.cho@gmail.com}
+
+Authors:
+\itemize{
+  \item Hyein Cho \email{hyein.sophia.cho@gmail.com}
+}
 
 }
 \keyword{internal}

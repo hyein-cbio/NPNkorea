@@ -3,10 +3,17 @@
 #' \code{toNPN()} converts WGS84 longitude/latitude coordinates into Korea's
 #' National Point Number (NPN) notation.
 #'
-#' @param input.df A data frame with numeric \code{lon} and \code{lat} columns
-#'   in WGS84 decimal degrees. Additional columns are allowed, but only
-#'   \code{lon} and \code{lat}
-#'   are used.
+#' @param input.df Coordinates to convert. This can be a data frame with numeric
+#'   \code{lon} and \code{lat} columns in WGS84 decimal degrees, an \code{sf} or
+#'   \code{sfc} object of POINT geometries, or a numeric longitude vector. For a
+#'   data frame, additional columns are allowed but ignored. For \code{sf}, the
+#'   point geometry is used and attribute columns are ignored.
+#' @param ... For a data frame or \code{sf}/\code{sfc} object, pass \code{output}
+#'   by name or as the second positional argument, as in \code{toNPN(df, "abc")}.
+#'   For a numeric longitude vector, pass latitudes as the second positional
+#'   argument or as \code{lat}, and pass \code{output} by name:
+#'   \code{toNPN(lon, lat, output = "han")}. Abbreviated names such as
+#'   \code{out} still match \code{output}.
 #' @param output Output alphabet for the leading two-letter grid band:
 #'   \code{"han"} (default) returns Hangul labels such as \code{"다사"}, and
 #'   \code{"abc"} returns romanized labels such as \code{"DaSa"}.
@@ -18,15 +25,24 @@
 #' Coordinates that fall outside the supported NPN grid after projection also
 #' raise an error.
 #'
+#' \code{sf} and \code{sfc} input must contain only POINT geometries and must
+#' have a CRS. Coordinates are transformed to EPSG:4326 before validation, so a
+#' projected CRS such as EPSG:5179 is accepted. Empty geometries are rejected,
+#' including points whose coordinates are missing.
+#' A zero-length object returns \code{character(0)}. Numeric longitudes and
+#' latitudes must have the same length. \code{toNPN(lon, "abc")} is rejected
+#' because \code{lat} is missing; pass \code{output} by name for numeric input.
+#'
 #' The returned NPN strings are formatted as \code{XX 1234 5678}, where
 #' \code{XX} is the
 #' 100 km grid-band pair and each four-digit block is a 10 m offset within that
 #' band.
 #'
-#' @return A character vector of NPN strings, one per row of \code{input.df}.
-#'   The output always uses the spaced form \code{XX 1234 5678}.
+#' @return A character vector of NPN strings, one per input row, feature, or
+#'   coordinate pair. The output always uses the spaced form \code{XX 1234 5678}.
 #'
-#' @seealso \code{\link{toWGS}()} for the reverse conversion.
+#' @seealso \code{\link{toWGS}()} for the reverse conversion and
+#'   \code{\link{format_npn}()} for normalizing an existing NPN string.
 #' @family NPN conversion
 #'
 #' @examples
@@ -37,12 +53,15 @@
 #'
 #' toNPN(pts)
 #' toNPN(pts, output = "abc")
-#' @importFrom sf st_as_sf st_transform st_coordinates
+#' toNPN(pts, "abc")
+#' toNPN(pts$lon, pts$lat, output = "abc")
+#' @importFrom sf st_as_sf st_transform st_coordinates st_geometry st_crs st_geometry_type st_is_empty
 #' @export
 
-toNPN = function(input.df, output="han") {
-  input.df = validate_lonlat_df(input.df)
-  output = match.arg(output, c("han", "abc"))
+toNPN = function(input.df, ...) {
+  args = resolve_tonpn_args(input.df, ...)
+  output = match.arg(args$output, c("han", "abc"))
+  input.df = coerce_tonpn_input(input.df, lat = args$lat)
 
   if (nrow(input.df) == 0) {
     return(character(0))
@@ -51,17 +70,12 @@ toNPN = function(input.df, output="han") {
   coords = project_to_npn_grid(input.df)
   parsed = validate_npn_grid_coords(coords)
 
-  lookup_col = if (output == "han") "han" else "abc"
-  Xletter = digits.df[[lookup_col]][match(parsed$x_digit, digits.df$digits)]
-  Yletter = digits.df[[lookup_col]][match(parsed$y_digit, digits.df$digits)]
-
-  return(paste0(
-    Xletter,
-    Yletter,
-    " ",
-    sprintf("%04d", parsed$x_pos),
-    " ",
-    sprintf("%04d", parsed$y_pos)
-  ))
-
+  format_npn_parts(
+    parsed$x_digit,
+    parsed$y_digit,
+    parsed$x_pos,
+    parsed$y_pos,
+    output,
+    spaced = TRUE
+  )
 }

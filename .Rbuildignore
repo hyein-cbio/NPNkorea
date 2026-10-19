@@ -7,3 +7,4 @@
 ^tests/\.DS_Store$
 ^\.{2}Rcheck$
 ^\.pi-subagents$
+^\.pi$

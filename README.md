@@ -26,6 +26,20 @@ toNPN(data.frame(lon=126.978422, lat=37.566742))
 toNPN(data.frame(lon=126.978422, lat=37.566742), output="abc")
 [1] "DaSa 5393 5205"
 
+# The second positional argument remains the output alphabet
+toNPN(data.frame(lon=126.978422, lat=37.566742), "abc")
+
+# Numeric longitude and latitude vectors; pass output by name
+toNPN(126.978422, 37.566742, output = "abc")
+
+# sf / sfc POINT geometries; the geometry is used, not attribute columns
+pts = sf::st_as_sf(
+  data.frame(lon = 126.978422, lat = 37.566742),
+  coords = c("lon", "lat"),
+  crs = 4326
+)
+toNPN(pts)
+
 ```
 
 GPS 경도, 위도로
@@ -40,6 +54,19 @@ toWGS("DaSa53965207")
                lon      lat
 DaSa53965207 126.9787 37.56684
 
+```
+
+문자열이 국가지점번호인지 확인하고, 표기를 한글로 또는 로마자로 정리할 수 있습니다.
+
+```R
+is_npn(c("다사 5396 5207", "dasa53965207", "not an npn", NA))
+[1] TRUE TRUE FALSE NA
+
+format_npn("dasa53965207")
+[1] "다사 5396 5207"
+
+format_npn("다사 5396 5207", output = "abc", spaced = FALSE)
+[1] "DaSa53965207"
 ```
 
 ## Command line usage

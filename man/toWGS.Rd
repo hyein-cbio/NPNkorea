@@ -40,7 +40,9 @@ toWGS(c("DaSa 5396 5207", "dada06940013"))
 \seealso{
 \code{\link{toNPN}()} for the reverse conversion.
 
-Other NPN conversion: 
-\code{\link{toNPN}()}
+Other NPN conversion:
+\code{\link[=format_npn]{format_npn()}},
+\code{\link[=is_npn]{is_npn()}},
+\code{\link[=toNPN]{toNPN()}}
 }
 \concept{NPN conversion}
