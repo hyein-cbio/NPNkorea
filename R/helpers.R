@@ -120,7 +120,10 @@ lonlat_df_from_points = function(x) {
     stop("`input.df` sf/sfc objects must contain only POINT geometries.")
   }
 
-  if (any(st_is_empty(geom))) {
+  # sf 1.0-19 keeps POINT(NA y) as a non-empty point (`st_is_empty()` is
+  # FALSE unless every coordinate is missing). Current sf rewrites that
+  # point to POINT EMPTY. Missing coordinates are empty geometries either way.
+  if (any(st_is_empty(geom)) || anyNA(st_coordinates(geom))) {
     stop("`input.df` sf/sfc objects must not contain empty geometries.")
   }
 
