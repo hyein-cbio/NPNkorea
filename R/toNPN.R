@@ -13,10 +13,10 @@
 #'   For a numeric longitude vector, pass latitudes as the second positional
 #'   argument or as \code{lat}, and pass \code{output} by name:
 #'   \code{toNPN(lon, lat, output = "han")}. Abbreviated names such as
-#'   \code{out} still match \code{output}.
-#' @param output Output alphabet for the leading two-letter grid band:
-#'   \code{"han"} (default) returns Hangul labels such as \code{"다사"}, and
-#'   \code{"abc"} returns romanized labels such as \code{"DaSa"}.
+#'   \code{out} still match \code{output}. \code{output} chooses the alphabet
+#'   for the leading two-letter grid band: \code{"han"} (default) returns
+#'   Hangul labels such as \code{"다사"}, and \code{"abc"} returns romanized
+#'   labels such as \code{"DaSa"}.
 #'
 #' @details
 #' Coordinates are transformed from WGS84 (EPSG:4326) to EPSG:5179, then mapped

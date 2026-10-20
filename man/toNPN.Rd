@@ -18,11 +18,10 @@ by name or as the second positional argument, as in \code{toNPN(df, "abc")}.
 For a numeric longitude vector, pass latitudes as the second positional
 argument or as \code{lat}, and pass \code{output} by name:
 \code{toNPN(lon, lat, output = "han")}. Abbreviated names such as
-\code{out} still match \code{output}.}
-
-\item{output}{Output alphabet for the leading two-letter grid band:
-\code{"han"} (default) returns Hangul labels such as \code{"다사"}, and
-\code{"abc"} returns romanized labels such as \code{"DaSa"}.}
+\code{out} still match \code{output}. \code{output} chooses the alphabet
+for the leading two-letter grid band: \code{"han"} (default) returns
+Hangul labels such as \code{"다사"}, and \code{"abc"} returns romanized
+labels such as \code{"DaSa"}.}
 }
 \value{
 A character vector of NPN strings, one per input row, feature, or

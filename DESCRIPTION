@@ -1,6 +1,6 @@
 Package: NPNkorea
 Type: Package
-Title: Convert the longitude / latitude to Korea's National Point Number (국가지점번호) and vice versa
+Title: Convert the Longitude / Latitude to Korea's National Point Number (국가지점번호) and Vice Versa
 Version: 0.1.1
 Authors@R: c(
     person(

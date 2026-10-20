@@ -4,7 +4,7 @@
 \name{NPNkorea-package}
 \alias{NPNkorea}
 \alias{NPNkorea-package}
-\title{NPNkorea: Convert the longitude / latitude to Korea's National Point Number (국가지점번호) and vice versa}
+\title{NPNkorea: Convert the Longitude / Latitude to Korea's National Point Number (국가지점번호) and Vice Versa}
 \description{
 Converts between Korea's National Point Number (NPN) grid references and WGS84 longitude/latitude coordinates, with support for both Hangul and romanized NPN labels.
 }
